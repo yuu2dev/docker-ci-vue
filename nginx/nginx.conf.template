@@ -1,0 +1,73 @@
+user nginx;
+
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    
+    server_tokens        off;
+    gzip                 on;
+
+    include              /etc/nginx/mime.types;
+    client_max_body_size 128M;
+
+    upstream api {
+        server api:9000; # docker-compose 의 api 서비스명
+    }
+
+    # API
+    server {
+
+        listen      8080;
+        server_name api;
+        root        ${API_VIRTUAL};
+        index       index.php index.html index.htm;
+        
+        location / {
+            try_files ${S}uri ${S}uri/ /index.php${S}is_args${S}args;
+        }
+      
+        location ~ \.php${S} {
+            try_files                     ${S}uri /index.php =404;
+            fastcgi_pass                  api;
+            fastcgi_index                 index.php;
+            fastcgi_buffers               16 16k;
+            fastcgi_buffer_size           32k;
+            fastcgi_param SCRIPT_FILENAME ${S}document_root${S}fastcgi_script_name;
+            fastcgi_read_timeout          600;
+            include                       fastcgi_params;
+        }
+
+        location ~ /\.ht {
+            deny all;
+        }
+    }
+    # APP
+    server {
+
+        listen      80;
+        server_name app;
+        index       index.html;
+        root        ${APP_VIRTUAL};
+        
+        set ${S}app_mode "${APP_MODE}";
+        
+        location / {
+            if (${S}app_mode = "PROD") {
+    
+            } 
+
+            if (${S}app_mode = "DEV") { 
+                proxy_pass http://app:8080;
+            }
+        }
+        
+ 
+        location ~ /\.ht {
+            deny all;
+        }
+    }
+}

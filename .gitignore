@@ -1,0 +1,5 @@
+.env
+.DS_Store
+nginx/logs
+db/data
+!db/data/.gitignore

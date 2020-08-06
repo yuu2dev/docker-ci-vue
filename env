@@ -1,0 +1,25 @@
+CURRENT=.
+
+API_CONTEXT=/api
+API_VIRTUAL=/var/www/html/api
+
+# PROD|DEV
+APP_MODE=false
+APP_CONTEXT=/app
+APP_VIRTUAL=/var/www/html/app
+
+NGINX_CONTEXT=/nginx
+NGINX_LOG=/nginx/logs
+NGINX_LOG_VIRTUAL=/var/log/nginx
+
+NGINX_CONF=/nginx.conf
+NGINX_CONF_VIRTUAL=/etc/nginx/nginx.conf
+
+MYSQL_CONTEXT=/mysql
+MYSQL_DATABASE=app_db
+
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_ROOT_PASSWORD=
+MYSQL_DB_DATA=
+MYSQL_DB_DATA_VIRTUAL=

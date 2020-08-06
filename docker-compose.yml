@@ -1,0 +1,81 @@
+version: '3.5'
+services:
+
+    #NGINX
+    nginx:
+        build:
+            context: ${CURRENT}${NGINX_CONTEXT}
+        container_name: nginx
+        depends_on:
+            - api
+            - app
+        environment: 
+            - API_VIRTUAL=${API_VIRTUAL}
+            - APP_VIRTUAL=${APP_VIRTUAL}
+            - APP_MODE=${APP_MODE} 
+            - SERVER_IP=${SERVER_IP}
+        ports:
+            - 80:80
+            - 8000:8000
+        volumes:
+            - ${CURRENT}${API_CONTEXT}:${API_VIRTUAL}
+            - ${CURRENT}${APP_CONTEXT}:${APP_VIRTUAL}
+            - ${APP_CONTEXT}/node_modules
+            - ${CURRENT}${NGINX_LOG}:${NGINX_LOG_VIRTUAL}
+            
+        networks:
+            - web
+
+    # MYSQL
+    mysql:
+        build:
+            context: ${CURRENT}${MYSQL_CONTEXT}
+        container_name: mysql
+        command: mysqld --sql_mode='' 
+                --innodb_use_native_aio=0
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        ports:
+            - 3306:3306
+        volumes: 
+            - ${CURRENT}${MYSQL_DB_DATA}:${MYSQL_DB_DATA_VIRTUAL}
+        networks:
+            - web
+
+  # PHP-FPM
+    api:
+        build:
+            context: ${CURRENT}${API_CONTEXT}
+        container_name: api
+        depends_on:
+            - mysql
+        environment:
+            - API_VIRTUAL=${API_VIRTUAL}
+        volumes:
+            - ${CURRENT}${API_CONTEXT}:${API_VIRTUAL}
+        networks:
+            - web
+
+  # Vue.js
+    app:
+        build:
+            context: ${CURRENT}${APP_CONTEXT}
+            args:
+                APP_VIRTUAL: ${APP_VIRTUAL}
+        container_name: app
+        volumes:
+            - ${CURRENT}${APP_CONTEXT}:${APP_VIRTUAL}
+            - ${APP_CONTEXT}/node_modules
+        environment:
+            - APP_VIRTUAL=${APP_VIRTUAL}
+            - APP_MODE=${APP_MODE}
+        ports:
+            - 8080:8080
+        networks:
+            - web
+networks:
+    web:
+
