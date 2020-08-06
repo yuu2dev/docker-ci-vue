@@ -1,7 +1,7 @@
-# 소개
-Codeigniter3, Vue.js, MySQL, Nginx 로 이루어진 초기 프로젝트 구성
+## 소개
+codeigniter3, vue.js, mysql, nginx 로 이루어진 프로젝트 초기 구성
 
-## Installation
+## 설치하기
 ```
 [1] mkdir /db/data
 
